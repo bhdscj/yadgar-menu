@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yadgar Restaurant – Menu</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --maroon: #7a1a1a;
+  --maroon-dark: #5a1010;
+  --gold: #c4892a;
+  --gold-light: #e8b96a;
+  --cream: #fdf8f0;
+  --cream-dark: #f5edd8;
+  --text: #2c1a0e;
+  --text-light: #6b4c2a;
+  --border: #d4b896;
+}
+body { background: var(--cream); color: var(--text); font-family: 'Lato', sans-serif; font-size: 14px; line-height: 1.5; }
+
+/* ── ADMIN BUTTON (floating) ── */
+#admin-btn {
+  position: fixed; bottom: 18px; right: 18px; z-index: 999;
+  background: var(--maroon); color: #fff; border: none;
+  width: 48px; height: 48px; border-radius: 50%;
+  font-size: 20px; cursor: pointer; box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── ADMIN MODAL ── */
+#admin-overlay {
+  display: none; position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.55); align-items: center; justify-content: center; padding: 12px;
+}
+#admin-overlay.open { display: flex; }
+#admin-modal {
+  background: #fff; border-radius: 14px; width: 100%; max-width: 560px;
+  max-height: 90vh; overflow-y: auto; padding: 0;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+}
+.modal-head {
+  background: var(--maroon); color: #fff; padding: 16px 20px;
+  border-radius: 14px 14px 0 0; display: flex; justify-content: space-between; align-items: center;
+}
+.modal-head h2 { font-family: 'Cinzel', serif; font-size: 15px; letter-spacing: 1px; }
+.modal-close { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; line-height: 1; }
+.modal-body { padding: 20px; }
+
+/* login */
+#login-box { text-align: center; padding: 10px 0 20px; }
+#login-box p { font-size: 13px; color: #666; margin-bottom: 14px; }
+#login-box input {
+  width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px;
+  font-size: 14px; margin-bottom: 10px; font-family: 'Lato', sans-serif;
+}
+#login-box button {
+  width: 100%; padding: 10px; background: var(--maroon); color: #fff;
+  border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: 'Lato', sans-serif;
+}
+#login-error { color: red; font-size: 12px; margin-top: 6px; }
+
+/* admin panel */
+#admin-panel { display: none; }
+.ap-section { margin-bottom: 20px; }
+.ap-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #999; margin-bottom: 6px; }
+.ap-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.ap-row input, .ap-row select {
+  flex: 1; min-width: 120px; padding: 8px 10px; border: 1px solid #ddd;
+  border-radius: 8px; font-size: 13px; font-family: 'Lato', sans-serif;
+}
+.ap-row input[type="text"] { }
+.btn-add {
+  background: var(--maroon); color: #fff; border: none; padding: 8px 18px;
+  border-radius: 8px; font-size: 13px; cursor: pointer; white-space: nowrap;
+}
+.btn-del {
+  background: none; border: 1px solid #ddd; color: #c00; padding: 4px 10px;
+  border-radius: 6px; font-size: 12px; cursor: pointer;
+}
+.item-chip {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: #fdf6ee; border: 1px solid #f0e0c0; border-radius: 8px; margin-bottom: 6px;
+}
+.item-chip-info { flex: 1; font-size: 13px; }
+.item-chip-info span { color: #999; font-size: 11px; margin-left: 6px; }
+.sec-group { margin-bottom: 14px; }
+.sec-group-title {
+  font-family: 'Cinzel', serif; font-size: 12px; color: var(--maroon);
+  letter-spacing: 1px; border-bottom: 1px solid #f0d8b0; padding-bottom: 5px; margin-bottom: 8px;
+}
+.btn-save-day {
+  width: 100%; padding: 11px; background: #2d6a2d; color: #fff;
+  border: none; border-radius: 8px; font-size: 14px; cursor: pointer;
+  font-family: 'Cinzel', serif; letter-spacing: 1px; margin-top: 8px;
+}
+.btn-logout {
+  background: none; border: 1px solid #ddd; color: #666; padding: 6px 14px;
+  border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 12px;
+}
+.save-ok { color: green; font-size: 13px; text-align: center; margin-top: 8px; display: none; }
+.day-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.day-tab {
+  padding: 5px 12px; border-radius: 16px; border: 1px solid #ddd;
+  font-size: 12px; cursor: pointer; background: #fff; color: #555;
+}
+.day-tab.active { background: var(--maroon); color: #fff; border-color: var(--maroon); }
+
+/* ── CUSTOMER MENU ── */
+.page { max-width: 900px; margin: 0 auto; background: var(--cream); position: relative; padding-bottom: 60px; }
+.outer-border { border: 2px solid var(--gold); margin: 12px; padding: 0; position: relative; }
+.outer-border::before { content:''; position:absolute; inset:4px; border:1px solid var(--gold-light); pointer-events:none; }
+.corner { position:absolute; width:10px; height:10px; background:var(--maroon); border-radius:50%; }
+.corner.tl{top:-5px;left:-5px} .corner.tr{top:-5px;right:-5px}
+.corner.bl{bottom:-5px;left:-5px} .corner.br{bottom:-5px;right:-5px}
+.header { text-align:center; padding:28px 20px 18px; border-bottom:1px solid var(--border); background:var(--cream); }
+.logo-text { font-family:'Playfair Display',serif; font-size:clamp(30px,7vw,52px); font-weight:900; color:var(--maroon); line-height:1.1; }
+.logo-text em { font-style:italic; color:var(--maroon-dark); }
+.tagline { font-family:'Cinzel',serif; font-size:clamp(8px,2vw,11px); letter-spacing:4px; color:var(--gold); margin-top:4px; text-transform:uppercase; }
+.day-badge { display:inline-block; margin-top:14px; background:var(--maroon); color:#fff; font-family:'Cinzel',serif; font-size:clamp(11px,2.5vw,14px); letter-spacing:3px; padding:7px 28px; border:1px solid var(--gold); }
+.columns { display:grid; grid-template-columns:1fr 1fr; gap:0; }
+.col { padding:18px 20px; }
+.col:first-child { border-right:1px solid var(--border); }
+.sec-head { font-family:'Cinzel',serif; font-size:clamp(12px,2.5vw,15px); font-weight:700; color:var(--maroon); letter-spacing:2px; text-transform:uppercase; border-bottom:1.5px solid var(--gold); padding-bottom:5px; margin-bottom:10px; margin-top:18px; }
+.sec-head:first-child { margin-top:0; }
+.size-badge { display:inline-block; font-size:9px; background:var(--maroon); color:#fff; padding:2px 8px; border-radius:2px; letter-spacing:1px; margin-left:6px; vertical-align:middle; font-family:'Lato',sans-serif; font-weight:700; }
+.item { display:flex; align-items:flex-start; padding:6px 0; border-bottom:0.5px solid #e8dcc8; gap:8px; }
+.item:last-child { border-bottom:none; }
+.item-left { flex:1; min-width:0; }
+.item-name { font-size:clamp(12px,2.5vw,14px); font-weight:700; color:var(--text); }
+.item-desc { font-size:10px; color:var(--text-light); line-height:1.4; margin-top:1px; }
+.item-right { text-align:right; flex-shrink:0; }
+.item-price { font-size:clamp(12px,2.5vw,14px); font-weight:700; color:var(--maroon); white-space:nowrap; }
+.item-kcal { font-size:9px; color:#999; margin-top:1px; white-space:nowrap; }
+.item-dotted { display:flex; align-items:baseline; padding:5px 0; border-bottom:0.5px solid #e8dcc8; gap:4px; }
+.item-dotted:last-child { border-bottom:none; }
+.item-dotted .iname { font-size:13px; font-weight:700; flex-shrink:0; }
+.dots { flex:1; border-bottom:1px dotted #c4a882; margin:0 4px; position:relative; top:-3px; }
+.item-dotted .iprice { font-size:13px; font-weight:700; color:var(--maroon); flex-shrink:0; }
+.item-dotted .ikcal { font-size:9px; color:#999; margin-left:6px; flex-shrink:0; }
+.idesc { font-size:10px; color:var(--text-light); line-height:1.3; padding:2px 0 4px; }
+.divider { text-align:center; margin:8px 0; color:var(--gold); font-size:14px; letter-spacing:6px; }
+.full-col { padding:14px 20px; border-top:1px solid var(--border); }
+.full-col .ci { display:grid; grid-template-columns:1fr 1fr; gap:0 24px; }
+.footer { border-top:1px solid var(--border); padding:12px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; background:var(--cream); }
+.footer-logo { font-family:'Playfair Display',serif; font-size:18px; font-style:italic; color:var(--maroon); font-weight:700; }
+.footer-note { font-size:10px; color:var(--text-light); text-align:center; flex:1; min-width:160px; }
+.footer-arabic { font-size:12px; color:var(--text-light); direction:rtl; }
+.no-items { font-size:12px; color:#bbb; padding:8px 0; font-style:italic; }
+@media(max-width:560px) {
+  .columns,.full-col .ci { grid-template-columns:1fr; }
+  .col:first-child { border-right:none; border-bottom:1px solid var(--border); }
+  .outer-border { margin:6px; }
+}
+</style>
+</head>
+<body>
+
+<!-- FLOATING ADMIN BUTTON -->
+<button id="admin-btn" onclick="openAdmin()" title="Admin">⚙</button>
+
+<!-- ADMIN OVERLAY -->
+<div id="admin-overlay">
+  <div id="admin-modal">
+    <div class="modal-head">
+      <h2>YADGAR – ADMIN PANEL</h2>
+      <button class="modal-close" onclick="closeAdmin()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- LOGIN -->
+      <div id="login-box">
+        <p>Admin password enter karo</p>
+        <input type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()" />
+        <button onclick="doLogin()">Login</button>
+        <div id="login-error"></div>
+      </div>
+
+      <!-- ADMIN PANEL -->
+      <div id="admin-panel">
+
+        <div class="ap-section">
+          <div class="ap-label">Din select karo</div>
+          <div class="day-tabs" id="day-tabs"></div>
+        </div>
+
+        <div class="ap-section">
+          <div class="ap-label">Naya item add karo</div>
+          <div class="ap-row" style="margin-bottom:8px">
+            <input type="text" id="in-section" placeholder="Section (e.g. Chicken/Mutton)" />
+          </div>
+          <div class="ap-row" style="margin-bottom:8px">
+            <input type="text" id="in-name" placeholder="Dish name (zaroori)" />
+            <input type="text" id="in-price" placeholder="Price e.g. SR 12/18" />
+          </div>
+          <div class="ap-row" style="margin-bottom:8px">
+            <input type="text" id="in-desc" placeholder="Description (optional)" />
+            <input type="text" id="in-kcal" placeholder="kcal (optional)" />
+          </div>
+          <button class="btn-add" onclick="addItem()">+ Add Item</button>
+        </div>
+
+        <div class="ap-section">
+          <div class="ap-label">Aaj ke menu items (hata sakte ho ❌)</div>
+          <div id="items-list"></div>
+        </div>
+
+        <button class="btn-save-day" onclick="saveMenu()">✓ Menu Save & Publish Karo</button>
+        <div class="save-ok" id="save-ok">✓ Menu live ho gaya!</div>
+        <br>
+        <button class="btn-logout" onclick="doLogout()">Logout</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOMER MENU -->
+<div class="page">
+ <div class="outer-border">
+  <span class="corner tl"></span><span class="corner tr"></span>
+  <span class="corner bl"></span><span class="corner br"></span>
+
+  <div class="header">
+    <div class="logo-text"><em>Yadgar</em> Restaurant</div>
+    <div class="tagline">Indo-Pak &nbsp;·&nbsp; Chinese Cuisine</div>
+    <div class="day-badge" id="live-day-badge">SUNDAY MENU</div>
+  </div>
+
+  <div id="menu-render"></div>
+
+  <div class="footer">
+    <div class="footer-logo">Yadgar Restaurant</div>
+    <div class="footer-note"><strong>NOTE:</strong> Calories are approximate and subject to variation.</div>
+    <div class="footer-arabic">ملاحظة: السعرات الحرارية تقديرية وقد تختلف</div>
+  </div>
+ </div>
+</div>
+
+<script>
+// ── DEFAULT MENU DATA ──
+const DEFAULT_MENU = {
+  Sunday: [
+    { section: "Parathas", items: [
+      { name:"Plain Paratha", price:"SR 2", desc:"Golden, flaky, layered flatbread", kcal:"300" },
+      { name:"Aloo Paratha", price:"SR 4", desc:"Stuffed with spiced mashed potatoes", kcal:"380" },
+      { name:"Gobi Paratha", price:"SR 5", desc:"Stuffed with spiced cauliflower", kcal:"320" }
+    ]},
+    { section: "Egg Specialties", items: [
+      { name:"Plain Omelette", price:"SR 3", desc:"Fluffy with onions & green chilies", kcal:"200" },
+      { name:"Half Fry (Sunny Side Up)", price:"SR 2", desc:"Fresh egg with a runny yolk", kcal:"180" },
+      { name:"Egg Bhurji", price:"SR 5", desc:"Indian-style scrambled eggs", kcal:"240" }
+    ]},
+    { section: "Hearty Specialties", items: [
+      { name:"Beef Paya", price:"SR 15", desc:"Rich slow-cooked beef trotters soup", kcal:"280" },
+      { name:"Bombay / Irani Qeema", price:"SR 12/18", desc:"Aromatic minced mutton in spiced gravy", kcal:"400" },
+      { name:"Chana Regular", price:"SR 3", desc:"", kcal:"250" }
+    ]},
+    { section: "Chicken / Mutton", items: [
+      { name:"Chicken Curry", price:"SR 10/16", desc:"Classic rich tomato and onion based curry", kcal:"350" },
+      { name:"Chicken White Qorma", price:"SR 12/18", desc:"Mild, creamy yogurt-based curry", kcal:"450" },
+      { name:"Chicken Kadhai (Dinner)", price:"SR 12/18", desc:"Wok tossed with tomatoes & green chillies", kcal:"500" },
+      { name:"Chicken Bhuna (Dinner)", price:"SR 14/20", desc:"Dry, richly spiced sautéed chicken", kcal:"450" },
+      { name:"Mutton Curry", price:"SR 13/20", desc:"Classic rich tomato and onion based curry", kcal:"550" },
+      { name:"Mutton Kadhai", price:"SR 16/22", desc:"Spicy wok tossed with crushed coriander", kcal:"650" }
+    ]},
+    { section: "Rice Delicacies", items: [
+      { name:"Chicken Dum Biryani", price:"SR 12/18", desc:"Layered basmati rice with chicken", kcal:"550" },
+      { name:"Chicken Pulao", price:"SR 14/20", desc:"Flavorful rice in traditional degh", kcal:"380" },
+      { name:"Vegetable Fried Rice", price:"SR 10/15", desc:"Stir-fried rice with mixed vegetables", kcal:"400" },
+      { name:"Chicken Fried Rice", price:"SR 14/20", desc:"Stir-fried rice with chicken & vegetables", kcal:"500" },
+      { name:"Matar Pulao", price:"SR 10", desc:"Fragrant rice with green peas", kcal:"350" },
+      { name:"White Rice", price:"SR 10", desc:"Simple steamed basmati rice", kcal:"220" }
+    ]},
+    { section: "Vegetable / Daal", items: [
+      { name:"Karela (Bitter Gourd)", price:"SR 8/12", desc:"Fried bitter gourd with spices", kcal:"200" },
+      { name:"Any Seasonal Veg", price:"SR 8/12", desc:"", kcal:"180" },
+      { name:"Daal Maash", price:"SR 7/10", desc:"Urad lentils slow-cooked with traditional spices", kcal:"280" },
+      { name:"Mix Daal", price:"SR 7/10", desc:"A blend of three lentils", kcal:"250" }
+    ]},
+    { section: "Tandoori Naan & Roti", items: [
+      { name:"Tandoori Roti", price:"SR 1 (2pcs)", desc:"Blend of whole wheat & maida; smoky tandoor flavor", kcal:"130" },
+      { name:"Whole Wheat Roti", price:"SR 1", desc:"100% whole wheat flour; healthier option", kcal:"110" },
+      { name:"Roghni Naan", price:"SR 2", desc:"Soft and fluffy naan finished with a touch of oil", kcal:"280" },
+      { name:"Kalonji Naan", price:"SR 2", desc:"Classic naan topped with black sesame seeds", kcal:"310" },
+      { name:"Garlic Naan", price:"SR 3", desc:"Fresh garlic and butter for a savory kick", kcal:"320" },
+      { name:"Aloo Naan", price:"SR 4", desc:"Stuffed with spiced mashed potato filling", kcal:"400" }
+    ]},
+    { section: "BBQ Delights (Dinner Only)", items: [
+      { name:"Chicken Tikka", price:"SR 12", desc:"Boneless chicken marinated in yogurt and spices", kcal:"280" },
+      { name:"Chicken Tikka Boti", price:"SR 12/20", desc:"Spicy, tender chicken cubes grilled on skewers", kcal:"320" },
+      { name:"Chicken Malai Boti", price:"SR 10/20", desc:"Creamy, mildly spiced grilled chicken", kcal:"450" }
+    ]},
+    { section: "Sweets & Beverages", items: [
+      { name:"Suji Ka Halwa", price:"SR 3", desc:"Warm semolina pudding with ghee & cardamom", kcal:"350" },
+      { name:"Regular Chai", price:"SR 5", desc:"", kcal:"130" },
+      { name:"Doodh Pati", price:"SR 5", desc:"", kcal:"200" }
+    ]},
+    { section: "Desserts & Drinks", items: [
+      { name:"Fruit Salad", price:"SR 5", desc:"Fresh seasonal fruits served chilled", kcal:"150" },
+      { name:"Water (Small/Big)", price:"SR —", desc:"Chilled bottled drinking water", kcal:"" },
+      { name:"Assorted Fizzy Drinks", price:"SR —", desc:"Refreshing carbonated soft drinks", kcal:"150" },
+      { name:"Meethi Lassi (Seasonal)", price:"SR 5", desc:"Sweet lassi", kcal:"300" }
+    ]}
+  ]
+};
+
+const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const ADMIN_PASS = "yadgar2024"; // ← APNA PASSWORD YAHAN CHANGE KARO
+
+let menuData = JSON.parse(localStorage.getItem('yadgar_menu') || 'null') || JSON.parse(JSON.stringify(DEFAULT_MENU));
+let adminDay = DAYS[new Date().getDay()];
+let tempItems = [];
+let loggedIn = false;
+
+// ── RENDER CUSTOMER MENU ──
+function renderCustomerMenu() {
+  const today = DAYS[new Date().getDay()];
+  document.getElementById('live-day-badge').textContent = today.toUpperCase() + ' MENU';
+  const sections = menuData[today] || menuData['Sunday'] || [];
+  if (!sections.length) {
+    document.getElementById('menu-render').innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;font-style:italic">Aaj ka menu update ho raha hai...</div>';
+    return;
+  }
+
+  // Build two-column layout
+  const left = [], right = [];
+  const breakSections = ["Chicken / Mutton","Rice Delicacies","Vegetable / Daal","BBQ Delights (Dinner Only)","Desserts & Drinks"];
+  let rightStarted = false;
+  sections.forEach(sec => {
+    if (!rightStarted && breakSections.some(b => sec.section.startsWith(b.split(' ')[0]) && sec.section.includes(b.split(' ')[1] || 'X') || sec.section === "Chicken / Mutton")) {
+      rightStarted = true;
+    }
+    (rightStarted ? right : left).push(sec);
+  });
+  // simpler split: first half left, second half right
+  const mid = Math.ceil(sections.length / 2);
+  const leftSecs = sections.slice(0, mid);
+  const rightSecs = sections.slice(mid);
+
+  let html = `<div class="columns"><div class="col">${renderSections(leftSecs)}</div><div class="col">${renderSections(rightSecs)}</div></div>`;
+  document.getElementById('menu-render').innerHTML = html;
+}
+
+function renderSections(secs) {
+  let h = '';
+  secs.forEach((sec, si) => {
+    h += `<div class="sec-head">${esc(sec.section)}</div>`;
+    if (!sec.items || !sec.items.length) {
+      h += '<div class="no-items">Items update ho rahe hain...</div>';
+    } else {
+      sec.items.forEach(it => {
+        h += `<div class="item">
+          <div class="item-left">
+            <div class="item-name">${esc(it.name)}</div>
+            ${it.desc ? `<div class="item-desc">${esc(it.desc)}</div>` : ''}
+          </div>
+          <div class="item-right">
+            <div class="item-price">${esc(it.price)}</div>
+            ${it.kcal ? `<div class="item-kcal">${esc(it.kcal)} kcal</div>` : ''}
+          </div>
+        </div>`;
+      });
+    }
+    if (si < secs.length - 1) h += '<div class="divider">✦ ✦ ✦</div>';
+  });
+  return h;
+}
+
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── ADMIN ──
+function openAdmin() {
+  document.getElementById('admin-overlay').classList.add('open');
+  if (!loggedIn) {
+    document.getElementById('login-box').style.display = 'block';
+    document.getElementById('admin-panel').style.display = 'none';
+  }
+}
+function closeAdmin() {
+  document.getElementById('admin-overlay').classList.remove('open');
+}
+function doLogin() {
+  const pw = document.getElementById('pw-input').value;
+  if (pw === ADMIN_PASS) {
+    loggedIn = true;
+    document.getElementById('login-box').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    document.getElementById('pw-input').value = '';
+    buildDayTabs();
+    loadDayItems();
+  } else {
+    document.getElementById('login-error').textContent = 'Galat password!';
+  }
+}
+function doLogout() {
+  loggedIn = false;
+  closeAdmin();
+  document.getElementById('login-box').style.display = 'block';
+  document.getElementById('admin-panel').style.display = 'none';
+}
+
+function buildDayTabs() {
+  const cont = document.getElementById('day-tabs');
+  cont.innerHTML = '';
+  DAYS.forEach(d => {
+    const b = document.createElement('button');
+    b.className = 'day-tab' + (d === adminDay ? ' active' : '');
+    b.textContent = d;
+    b.onclick = () => { adminDay = d; buildDayTabs(); loadDayItems(); };
+    cont.appendChild(b);
+  });
+}
+
+function loadDayItems() {
+  tempItems = JSON.parse(JSON.stringify(menuData[adminDay] || []));
+  renderItemsList();
+}
+
+function renderItemsList() {
+  const cont = document.getElementById('items-list');
+  if (!tempItems.length) { cont.innerHTML = '<div style="color:#bbb;font-size:13px;padding:8px 0">Koi items nahi — upar se add karo</div>'; return; }
+  let h = '';
+  tempItems.forEach((sec, si) => {
+    h += `<div class="sec-group">
+      <div class="sec-group-title">${esc(sec.section)}</div>`;
+    sec.items.forEach((it, ii) => {
+      h += `<div class="item-chip">
+        <div class="item-chip-info">${esc(it.name)} <span>${esc(it.price)}</span>${it.kcal ? ` <span>${esc(it.kcal)} kcal</span>` : ''}</div>
+        <button class="btn-del" onclick="removeItem(${si},${ii})">❌</button>
+      </div>`;
+    });
+    h += `</div>`;
+  });
+  cont.innerHTML = h;
+}
+
+function addItem() {
+  const section = document.getElementById('in-section').value.trim() || 'Daily Specials';
+  const name = document.getElementById('in-name').value.trim();
+  const price = document.getElementById('in-price').value.trim();
+  const desc = document.getElementById('in-desc').value.trim();
+  const kcal = document.getElementById('in-kcal').value.trim();
+  if (!name || !price) { alert('Dish name aur price zaroori hain!'); return; }
+
+  let sec = tempItems.find(s => s.section === section);
+  if (!sec) { sec = { section, items: [] }; tempItems.push(sec); }
+  sec.items.push({ name, price, desc, kcal });
+
+  document.getElementById('in-name').value = '';
+  document.getElementById('in-price').value = '';
+  document.getElementById('in-desc').value = '';
+  document.getElementById('in-kcal').value = '';
+  renderItemsList();
+}
+
+function removeItem(si, ii) {
+  tempItems[si].items.splice(ii, 1);
+  if (!tempItems[si].items.length) tempItems.splice(si, 1);
+  renderItemsList();
+}
+
+function saveMenu() {
+  menuData[adminDay] = JSON.parse(JSON.stringify(tempItems));
+  localStorage.setItem('yadgar_menu', JSON.stringify(menuData));
+  const ok = document.getElementById('save-ok');
+  ok.style.display = 'block';
+  setTimeout(() => ok.style.display = 'none', 3000);
+  renderCustomerMenu();
+}
+
+// ── INIT ──
+renderCustomerMenu();
+</script>
+</body>
+</html>
