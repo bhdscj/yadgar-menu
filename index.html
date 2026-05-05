@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Yadgar Menu</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yadgar Menu</title>
 
   <style>
     body {
@@ -13,30 +14,27 @@
       color: #333;
     }
 
-    .header {
-      padding: 30px 20px 10px;
+    .container {
+      padding: 30px 15px;
     }
 
-    .header img {
-      width: 220px;
-      max-width: 90%;
+    .logo {
+      max-width: 220px;
+      width: 90%;
+      margin-bottom: 15px;
     }
 
-    h2 {
-      margin-top: 10px;
+    h1 {
       color: #6b2c35;
+      margin-bottom: 20px;
     }
 
-    .menu {
-      padding: 20px;
-    }
-
-    a {
+    .menu-btn {
       display: block;
       background: white;
       margin: 10px auto;
       padding: 15px;
-      width: 85%;
+      width: 90%;
       max-width: 400px;
       border-radius: 12px;
       text-decoration: none;
@@ -44,9 +42,10 @@
       font-size: 18px;
       font-weight: 500;
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: 0.3s;
     }
 
-    a:hover {
+    .menu-btn:hover {
       background: #6b2c35;
       color: white;
     }
@@ -56,19 +55,22 @@
 
 <body>
 
-<div class="header">
-  <img src="logo.png" alt="Yadgar Restaurant">
-  <h2>Select Your Menu</h2>
-</div>
+<div class="container">
 
-<div class="menu">
-  <a href="monday.html">Monday Menu</a>
-  <a href="tuesday.html">Tuesday Menu</a>
-  <a href="wednesday.html">Wednesday Menu</a>
-  <a href="thursday.html">Thursday Menu</a>
-  <a href="friday.html">Friday Menu</a>
-  <a href="saturday.html">Saturday Menu</a>
-  <a href="sunday.html">Sunday Menu</a>
+  <!-- LOGO -->
+  <img src="logo.png" alt="Yadgar Restaurant" class="logo">
+
+  <h1>Select Your Menu</h1>
+
+  <!-- MENU LINKS -->
+  <a href="monday.html" class="menu-btn">Monday Menu</a>
+  <a href="tuesday.html" class="menu-btn">Tuesday Menu</a>
+  <a href="wednesday.html" class="menu-btn">Wednesday Menu</a>
+  <a href="thursday.html" class="menu-btn">Thursday Menu</a>
+  <a href="friday.html" class="menu-btn">Friday Menu</a>
+  <a href="saturday.html" class="menu-btn">Saturday Menu</a>
+  <a href="sunday.html" class="menu-btn">Sunday Menu</a>
+
 </div>
 
 </body>
